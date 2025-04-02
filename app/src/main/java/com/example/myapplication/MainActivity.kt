@@ -6,17 +6,19 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.ui.theme.MyApplicationTheme
+
+data class Car(val imageResId: Int, val name: String)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +27,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyApplicationTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    CarSlideshowApp(
+                    CarList(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -35,83 +37,54 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun CarSlideshowApp(modifier: Modifier = Modifier) {
-    // List of car images and captions
+fun CarList(modifier: Modifier = Modifier) {
     val cars = listOf(
-        Pair(R.drawable.car1, "Ferrari SF90"),
-        Pair(R.drawable.car2, "Lamborghini Aventador SVJ"),
-        Pair(R.drawable.car3, "Porsche 911 GT3 RS"),
-        Pair(R.drawable.car4, "Toyota Supra MK3"),
-        Pair(R.drawable.car5, "Koenigsegg Gemera"),
-        Pair(R.drawable.car6, "Ford Mustang RTR")
+        Car(R.drawable.car1, "Ferrari SF90"),
+        Car(R.drawable.car2, "Lamborghini Aventador SVJ"),
+        Car(R.drawable.car3, "Porsche 911 GT3 RS"),
+        Car(R.drawable.car4, "Toyota Supra MK3"),
+        Car(R.drawable.car5, "Koenigsegg Gemera"),
+        Car(R.drawable.car6, "Ford Mustang RTR"),
+        Car(R.drawable.car7, "Audi RS6 ABT"),
+        Car(R.drawable.car8, "BMW M4 CSL"),
+        Car(R.drawable.car9, "Mercedes-Benz AMG GT"),
+        Car(R.drawable.car10, "Nissan GT-R Nismo GT3 Race Car")
     )
 
-    var currentIndex by remember { mutableIntStateOf(1) }
-    var inputText by remember { mutableStateOf("") }
-
-    Column(
+    LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Display Car Image and Caption
-        Image(
-            painter = painterResource(id = cars[currentIndex - 1].first),  // Adjusted to 1-based indexing
-            contentDescription = "Car Image",
-            modifier = Modifier
-                .size(300.dp)
-                .padding(8.dp)
-        )
-        Text(
-            text = cars[currentIndex - 1].second,
-            fontSize = 18.sp,
-            modifier = Modifier.padding(8.dp)
-        )
-
-        Row(
-            modifier = Modifier.padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Button(onClick = {
-                currentIndex = if (currentIndex > 1) currentIndex - 1 else cars.size
-            }) {
-                Text("Previous")
-            }
-
-            Button(onClick = {
-                currentIndex = if (currentIndex < cars.size) currentIndex + 1 else 1
-            }) {
-                Text("Next")
-            }
+        items(cars) { car ->
+            CarItem(car)
         }
+    }
+}
 
-        OutlinedTextField(
-            value = inputText,
-            onValueChange = { inputText = it },
-            label = { Text("Go to car number") },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+@Composable
+fun CarItem(car: Car) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(id = car.imageResId),
+            contentDescription = car.name,
             modifier = Modifier
-                .padding(8.dp)
+                .height(200.dp)
                 .fillMaxWidth()
         )
-
-        Button(onClick = {
-            val index = inputText.toIntOrNull()
-            if (index != null && index in 1..cars.size) {
-                currentIndex = index
-            }
-        }) {
-            Text("Go")
-        }
+        Text(text = car.name, fontSize = 18.sp, modifier = Modifier.padding(top = 8.dp))
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun CarSlideshowPreview() {
+fun PreviewCarList() {
     MyApplicationTheme {
-        CarSlideshowApp()
+        CarList()
     }
 }
